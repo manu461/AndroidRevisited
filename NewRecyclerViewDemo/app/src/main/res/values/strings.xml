@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NewRecyclerViewDemo</string>
+    <string name="tableOfEditText">Table of</string>
+    <string name="uptoEditText">Upto</string>
+</resources>

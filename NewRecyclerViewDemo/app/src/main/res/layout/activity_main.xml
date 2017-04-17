@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".ActivityOne">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"
+        android:background="#ffffff"
+        android:textColorHint="#c2145a"
+        android:hint="@string/tableOfEditText"
+        android:padding="10sp"
+        android:textSize="20sp"
+        android:id="@+id/id_editText_TableOf_ActivityOne"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"
+        android:background="#ffffff"
+        android:textColorHint="#c2145a"
+        android:hint="@string/uptoEditText"
+        android:layout_marginTop="50sp"
+        android:padding="10sp"
+        android:textSize="20sp"
+        android:id="@+id/id_editText_Upto_ActivityOne"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10sp"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="Get Table"
+        android:textAllCaps="false"
+        android:layout_marginTop="150dp"
+        android:background="@color/colorPrimaryDark"
+        android:id="@+id/id_button_getTable_ActivityOne"/>
+</LinearLayout>

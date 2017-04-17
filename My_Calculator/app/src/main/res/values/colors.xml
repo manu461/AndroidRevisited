@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#f7284e</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#f7284e</color>
+    <color name="operator">#ffffff</color>
+    <color name="operand">#f7284e</color>
+    <color name="equal">#20b31c</color>
+    <color name="buttonBkg">#000000</color>
+
+</resources>

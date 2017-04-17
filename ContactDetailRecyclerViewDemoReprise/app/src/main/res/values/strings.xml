@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ContactDetailRecyclerViewDemoReprise</string>
+    <string name="toastNotificationOnDataSave">Contact details added</string>
+</resources>
