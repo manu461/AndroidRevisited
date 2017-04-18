@@ -1,9 +1,20 @@
 package com.example.stalker.recyclerviewwithcardviewandprogressbar;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,9 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by staLker on 14-04-2017.
@@ -21,10 +35,18 @@ import java.util.List;
 
 public class StudentListFragment extends Fragment {
     private RecyclerView mRecyclerView;
-    private TextView mCurrentLocation;
+    private TextView mCurrentLat;
+    private TextView mCurrentLong;
     private StudentListAdapter mStudentAdapter;
-    private List<Student> mStudentList;
+    private ArrayList<Student> mStudentList;
+    private View v;
     protected Handler handler;
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS = 201;
+    private static final int OPEN_SETTING_FOR_PERMISSION = 100;
+    private boolean sentToSettings = false;
+    private SharedPreferences permissionStatus;
+    private String[] requiredPermissions = new String[]{Manifest.permission.READ_CONTACTS,Manifest.permission.ACCESS_FINE_LOCATION};
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,21 +57,193 @@ public class StudentListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.student_list_fragment,container,false);
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
-        mCurrentLocation = (TextView) v.findViewById(R.id.current_location_textView);
 
+        v = inflater.inflate(R.layout.student_list_fragment,container,false);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+        mCurrentLat = (TextView) v.findViewById(R.id.current_location_Latitude__textView);
+
+        mCurrentLong = (TextView) v.findViewById(R.id.current_location_Longitude_textView);
         mStudentList = new ArrayList<Student>();
         handler = new Handler();
+
         loadTheList();
 
         mRecyclerView.setHasFixedSize(true);
-
         updateUI();
+
+
 
         return v;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        permissionStatus = getActivity().getSharedPreferences("permissionStatus",MODE_PRIVATE);
+        if(v != null){
+            getReadContactandGPSPermission();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == OPEN_SETTING_FOR_PERMISSION) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), requiredPermissions[0]) == PackageManager.PERMISSION_GRANTED) {
+                //Got Permission
+                gotAllPermissions();
+
+            }
+        }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(sentToSettings){
+            if(ActivityCompat.checkSelfPermission(getActivity(),requiredPermissions[0]) == PackageManager.PERMISSION_GRANTED){
+                gotAllPermissions();
+            }
+        }
+    }
+
+    private void getReadContactandGPSPermission() {
+
+        if (ContextCompat.checkSelfPermission(getActivity(), requiredPermissions[0]) != PackageManager.PERMISSION_GRANTED
+                ||ContextCompat.checkSelfPermission(getActivity(), requiredPermissions[1]) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), requiredPermissions[0])
+                    ||ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),requiredPermissions[1])) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Need Multiple Permission");
+                builder.setMessage("This app needs GPS and Contact permission.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        ActivityCompat.requestPermissions(getActivity(), requiredPermissions, MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+
+            }
+            else if (permissionStatus.getBoolean(requiredPermissions[0],false)) {
+                //Previously Permission Request was cancelled with 'Dont Ask Again',
+                // Redirect to Settings after showing Information about why you need the permission
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Need Multiple Permission");
+                builder.setMessage("This app needs GPS and Contact permission.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        sentToSettings = true;
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, OPEN_SETTING_FOR_PERMISSION);
+                        Toast.makeText(getActivity().getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+            else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(getActivity(), requiredPermissions, MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+            SharedPreferences.Editor editor = permissionStatus.edit();
+            editor.putBoolean(Manifest.permission.READ_CONTACTS,true);
+            editor.commit();
+        }
+        else {
+
+            gotAllPermissions();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS: {
+                // If request is cancelled, the result arrays are empty.
+                boolean allgranted = false;
+                for(int i=0;i<grantResults.length;i++){
+                    if(grantResults[i]==PackageManager.PERMISSION_GRANTED){
+                        allgranted = true;
+                    } else {
+                        allgranted = false;
+                        break;
+                    }
+                }
+
+                if(allgranted) {
+                    gotAllPermissions();
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), requiredPermissions[0])
+                        ||ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),requiredPermissions[1])) {
+
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Need Multiple Permission");
+                    builder.setMessage("This app needs GPS and Contact permission.");
+                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            ActivityCompat.requestPermissions(getActivity(), requiredPermissions, MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS);
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
+
+                }
+                else{
+                    Toast.makeText(getActivity().getBaseContext(),"Unable to get Permission",Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    private void gotAllPermissions() {
+
+
+    }
 
 
     private void updateUI() {
@@ -85,6 +279,8 @@ public class StudentListFragment extends Fragment {
             mStudentList.add(new Student("Student"+i,i+91231432));
         }
     }
+
+
 
 
 
@@ -177,13 +373,7 @@ public class StudentListFragment extends Fragment {
         }
     }
 
-
-
-
-
-
-
-        public class StudentListViewHolder extends RecyclerView.ViewHolder{
+    public class StudentListViewHolder extends RecyclerView.ViewHolder{
         private TextView mName;
         private TextView mContact;
 
@@ -193,9 +383,6 @@ public class StudentListFragment extends Fragment {
             mContact = (TextView) itemView.findViewById(R.id.list_row_contact);
         }
     }
-
-
-
 
     public class ProgressBarViewHolder extends RecyclerView.ViewHolder{
         private ProgressBar mProgressBar;
