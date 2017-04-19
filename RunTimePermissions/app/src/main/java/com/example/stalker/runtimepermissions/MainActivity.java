@@ -26,17 +26,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
+
         getReadContactandGPSPermission();
 
     }
     private void gotAllPermissions() {
         Toast.makeText(MainActivity.this,"We already got the permission",Toast.LENGTH_SHORT).show();
     }
-
-
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -50,15 +46,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
-
-
-
-
-
     @Override
     protected void onPostResume() {
         super.onPostResume();
@@ -69,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void getReadContactandGPSPermission() {
+        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, requiredPermissions[0]) != PackageManager.PERMISSION_GRANTED
                 ||ContextCompat.checkSelfPermission(MainActivity.this, requiredPermissions[1]) != PackageManager.PERMISSION_GRANTED) {

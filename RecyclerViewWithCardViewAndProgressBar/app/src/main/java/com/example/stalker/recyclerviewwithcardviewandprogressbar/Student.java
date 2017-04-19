@@ -3,53 +3,48 @@ package com.example.stalker.recyclerviewwithcardviewandprogressbar;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Random;
 import java.util.UUID;
 
 /**
  * Created by staLker on 14-04-2017.
  */
 
-public class Student implements Parcelable {
-    private UUID id;
+public class Student {
+
     private String name;
-    private int contact;
+    private String claas;
+    private int roll;
+    private String address;
+    private int phone;
+    private UUID studentID;
+    private String dateOfAdmission;
     private int lat;
     private int longi;
 
-    public Student(){
-        this.id = UUID.randomUUID();
-    }
-    public Student(String name,int contact){
-        this();
-        this.name = name;
-        this.contact = contact;
-    }
-
-    protected Student(Parcel in) {
-        name = in.readString();
-        contact = in.readInt();
-        lat = in.readInt();
-        longi = in.readInt();
-    }
-
-    public static final Creator<Student> CREATOR = new Creator<Student>() {
-        @Override
-        public Student createFromParcel(Parcel in) {
-            return new Student(in);
-        }
-
-        @Override
-        public Student[] newArray(int size) {
-            return new Student[size];
-        }
-    };
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setContact(int contact) {
-        this.contact = contact;
+    public void setClaas(String claas) {
+        this.claas = claas;
+    }
+
+    public void setRoll(int roll) {
+        this.roll = roll;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setPhone(int phone) {
+        this.phone = phone;
+    }
+
+    public void setDateOfAdmission(String dateOfAdmission) {
+        this.dateOfAdmission = dateOfAdmission;
     }
 
     public void setLat(int lat) {
@@ -61,12 +56,31 @@ public class Student implements Parcelable {
     }
 
     public String getName() {
-
         return name;
     }
 
-    public int getContact() {
-        return contact;
+    public String getClaas() {
+        return claas;
+    }
+
+    public int getRoll() {
+        return roll;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public int getPhone() {
+        return phone;
+    }
+
+    public UUID getStudentID() {
+        return studentID;
+    }
+
+    public String getDateOfAdmission() {
+        return dateOfAdmission;
     }
 
     public int getLat() {
@@ -77,17 +91,16 @@ public class Student implements Parcelable {
         return longi;
     }
 
+    public Student(String name, String claas, int roll, String address, int phone, String dateOfAdmission, int lat, int longi) {
+        this.studentID = UUID.randomUUID();
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeInt(contact);
-        dest.writeInt(lat);
-        dest.writeInt(longi);
+        this.name = name;
+        this.claas = claas;
+        this.roll = roll;
+        this.address = address;
+        this.phone = phone;
+        this.dateOfAdmission = dateOfAdmission;
+        this.lat = lat;
+        this.longi = longi;
     }
 }
