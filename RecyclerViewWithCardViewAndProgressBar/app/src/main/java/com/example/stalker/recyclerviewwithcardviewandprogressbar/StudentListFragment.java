@@ -92,7 +92,7 @@ public class StudentListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OPEN_SETTING_FOR_PERMISSION) {
             if (ActivityCompat.checkSelfPermission(getActivity(), requiredPermissions[0]) == PackageManager.PERMISSION_GRANTED) {
-                
+
                 gotAllPermissions();
 
             }
@@ -237,7 +237,7 @@ public class StudentListFragment extends Fragment {
     private void gotAllPermissions() {
         loadLocation();
         Fragment frg = null;
-        frg = getFragmentManager().findFragmentByTag("Your_Fragment_TAG");
+        frg = getFragmentManager().findFragmentByTag("1234");
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(frg);
         ft.attach(frg);
