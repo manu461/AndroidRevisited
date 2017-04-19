@@ -236,12 +236,6 @@ public class StudentListFragment extends Fragment {
 
     private void gotAllPermissions() {
         loadLocation();
-        Fragment frg = null;
-        frg = getFragmentManager().findFragmentByTag("1234");
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.detach(frg);
-        ft.attach(frg);
-        ft.commit();
         Log.e("One:","called load location");
 
 
