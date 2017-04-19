@@ -52,11 +52,11 @@ public class GPSTracker extends Service implements LocationListener {
             locationManager = (LocationManager) mContext
                     .getSystemService(LOCATION_SERVICE);
 
-            // getting GPS status
+
             checkGPS = locationManager
                     .isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-            // getting network status
+
             checkNetwork = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
@@ -64,7 +64,7 @@ public class GPSTracker extends Service implements LocationListener {
                 Toast.makeText(mContext, "No Service Provider Available", Toast.LENGTH_SHORT).show();
             } else {
                 this.canGetLocation = true;
-                // First get location from Network Provider
+
                 if (checkNetwork) {
 
                     try {
@@ -88,7 +88,7 @@ public class GPSTracker extends Service implements LocationListener {
                     }
                 }
             }
-            // if GPS Enabled get lat/long using GPS Services
+
             if (checkGPS) {
 
                 if (loc == null) {

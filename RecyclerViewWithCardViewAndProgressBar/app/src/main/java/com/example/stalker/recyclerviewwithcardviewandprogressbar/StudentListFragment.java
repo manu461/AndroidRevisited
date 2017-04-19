@@ -92,7 +92,7 @@ public class StudentListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OPEN_SETTING_FOR_PERMISSION) {
             if (ActivityCompat.checkSelfPermission(getActivity(), requiredPermissions[0]) == PackageManager.PERMISSION_GRANTED) {
-                //Got Permission
+                
                 gotAllPermissions();
 
             }
@@ -113,13 +113,11 @@ public class StudentListFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(getActivity(), requiredPermissions[0]) != PackageManager.PERMISSION_GRANTED
                 ||ContextCompat.checkSelfPermission(getActivity(), requiredPermissions[1]) != PackageManager.PERMISSION_GRANTED) {
 
-            // Should we show an explanation?
+
             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), requiredPermissions[0])
                     ||ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),requiredPermissions[1])) {
 
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Need Multiple Permission");
                 builder.setMessage("This app needs GPS and Contact permission.");
@@ -140,8 +138,7 @@ public class StudentListFragment extends Fragment {
 
             }
             else if (permissionStatus.getBoolean(requiredPermissions[0],false)) {
-                //Previously Permission Request was cancelled with 'Dont Ask Again',
-                // Redirect to Settings after showing Information about why you need the permission
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Need Multiple Permission");
                 builder.setMessage("This app needs GPS and Contact permission.");
@@ -166,13 +163,10 @@ public class StudentListFragment extends Fragment {
             }
             else {
 
-                // No explanation needed, we can request the permission.
 
                 ActivityCompat.requestPermissions(getActivity(), requiredPermissions, MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS);
 
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
+
             }
             SharedPreferences.Editor editor = permissionStatus.edit();
             editor.putBoolean(Manifest.permission.READ_CONTACTS,true);
@@ -242,6 +236,12 @@ public class StudentListFragment extends Fragment {
 
     private void gotAllPermissions() {
         loadLocation();
+        Fragment frg = null;
+        frg = getFragmentManager().findFragmentByTag("Your_Fragment_TAG");
+        final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(frg);
+        ft.attach(frg);
+        ft.commit();
         Log.e("One:","called load location");
 
 
