@@ -13,10 +13,12 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -41,6 +44,7 @@ public class StudentListFragment extends Fragment {
     private ArrayList<Student> mStudentList;
     private View v;
     protected Handler handler;
+    private GPSTracker gps;
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS_AND_FINE_GPS = 201;
     private static final int OPEN_SETTING_FOR_PERMISSION = 100;
     private boolean sentToSettings = false;
@@ -61,14 +65,13 @@ public class StudentListFragment extends Fragment {
         v = inflater.inflate(R.layout.student_list_fragment,container,false);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mCurrentLat = (TextView) v.findViewById(R.id.current_location_Latitude__textView);
-
         mCurrentLong = (TextView) v.findViewById(R.id.current_location_Longitude_textView);
         mStudentList = new ArrayList<Student>();
+
         handler = new Handler();
 
         loadTheList();
 
-        mRecyclerView.setHasFixedSize(true);
         updateUI();
 
 
@@ -81,9 +84,7 @@ public class StudentListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         permissionStatus = getActivity().getSharedPreferences("permissionStatus",MODE_PRIVATE);
-        if(v != null){
             getReadContactandGPSPermission();
-        }
     }
 
     @Override
@@ -153,8 +154,7 @@ public class StudentListFragment extends Fragment {
                         Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
                         intent.setData(uri);
                         startActivityForResult(intent, OPEN_SETTING_FOR_PERMISSION);
-                        Toast.makeText(getActivity().getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
-                    }
+                                           }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
@@ -241,6 +241,9 @@ public class StudentListFragment extends Fragment {
     }
 
     private void gotAllPermissions() {
+        loadLocation();
+        Log.e("One:","called load location");
+
 
 
     }
@@ -280,12 +283,34 @@ public class StudentListFragment extends Fragment {
         }
     }
 
+    private  void loadLocation(){
+        gps = new GPSTracker(getActivity());
+        Log.e("One:","inside load location");
 
 
+        if(gps.canGetLocation()){
+            Log.e("One:","inside if of load location");
 
 
+            double longitude = gps.getLongitude();
+            double latitude = gps .getLatitude();
+            mCurrentLong.setText("Long: "+Double.toString(longitude));
+            mCurrentLat.setText("Lat: "+Double.toString(latitude));
 
+        }
+        else
+        {
+            Log.e("One:","inside else of load location");
 
+            gps.showSettingsAlert();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        gps.stopUsingGPS();
+    }
 
     public class StudentListAdapter extends RecyclerView.Adapter {
         private final int VIEW_ITEM = 1;
